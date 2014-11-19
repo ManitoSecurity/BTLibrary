@@ -5,7 +5,7 @@
 */
 
 #include <Arduino.h>
-#include "../BTLib/rn41_lib_sand.h" //this might need to change for windows
+#include <rn41_lib_sand.h> //this needs to be put in the ardunio library directory
 
 #define masterMAC 123443211234
 #define slaveMAC 123443211234
