@@ -12,7 +12,9 @@
 #define N41_h
 
 #include <Arduino.h>
-#include <SoftwareSerial.h>
+#include <../SoftwareSerial/SoftwareSerial.h>
+//this might be different depending on where you have things and what os
+
 
 //adjust to your hardware design
 #define RXPIN 3
@@ -155,33 +157,31 @@ class rn41
     bool checkConnection();
 
     /*
-    @find and connect to given bt MAC
-    @pre module is set to be master, mac is mac to be connected to
+    @find BT device and offer connection if friend
+    @pre module is set to be master
     @post
     @returns true if successful connection else false
-    @usage makeMasterConnection(mac);
+    @usage makeMasterConnection();
     */
-    bool makeMasterConnection(char* mac);
+    bool makeMasterConnection();
 
   private:
     int msgToken;
 
-    const int rxPin = RXPIN;
-    const int txPin = TXPIN;
+    static const int rxPin = RXPIN;
+    static const int txPin = TXPIN;
 
     char BTMsg[256];
     char BTCmd[256];
 
-    const int MaxNumFriends = 7;
+    static const int MaxNumFriends = 7;
     int NumFriends;
     char* Friends[MaxNumFriends];
 
     char myAddr[12];
-    bool isMaster
+    bool isMaster;
     bool connected;
     char connectionAdr[12];
-
-    File gLogFile;
 };
 
 

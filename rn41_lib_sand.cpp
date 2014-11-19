@@ -14,7 +14,7 @@
   @post rn-14 object exists
   @usage
 */
-rn41(){
+rn41::rn41(){
   masterPin  = 4;
   isMaster   = 0;
   msgToken   = 0;
@@ -29,7 +29,7 @@ rn41(){
   @post rn-14 ready to rock and roll
   @usage
 */
-void btInit(){
+void rn41::btInit(){
   myAddr = MYADDRESS;
   Serial.begin(BAUDRATE);
   checkConnection();
@@ -43,7 +43,7 @@ void btInit(){
   @post set as master and rebooted
   @usage setAsMaster();
 */
-void setAsMaster(){
+void rn41::setAsMaster(){
   sendBtCmd("SM,1");
   sendBtCmd("---");
   reboot();
@@ -57,7 +57,7 @@ void setAsMaster(){
   @post set as slave and rebooted
   @usage setAsSlave();
 */
-void setAsSlave(){
+void rn41::setAsSlave(){
   sendBtCmd("SM,0");
   sendBtCmd("---");
   reboot();
@@ -71,7 +71,7 @@ void setAsSlave(){
   @post rebooted module, settings updated
   @usage reboot(); or bt_obj.reboot();
 */
-void reboot(){
+void rn41::reboot(){
   sendBtCmd("R,1");
   sendBtCmd("---");
 }
@@ -83,7 +83,7 @@ void reboot(){
     <BT address>,<BT name>,<COD> CR <BT address>,<BT name>,<COD> CR "Inquiry Done" CR
   @usage
 */
-void lookForDevices(){
+void rn41::lookForDevices(){
   sendBtCmd("I,5");
   sendBtCmd("---");
 }
@@ -96,7 +96,7 @@ void lookForDevices(){
   @returns first device found
   @usage connectionAdr = getMacFromInquiry();
 */
-char* getMacFromInquiry(){
+char* rn41::getMacFromInquiry(){
   char[12] mac;
   int i;
   for(i =0; i<12; i++){
@@ -112,7 +112,7 @@ char* getMacFromInquiry(){
   @returns true or false based on connection success
   @usage
 */
-bool offerConnection(char* mac){
+bool rn41::offerConnection(char* mac){
   BTCmd[0] = 'C'; //C,address is command to make connection
   BTCmd[1] = ',';
 
@@ -132,7 +132,7 @@ bool offerConnection(char* mac){
   @post mac is newest friend; numfriends++
   @usage addFriend(mac);
 */
-void addFriend(char* mac){
+void rn41::addFriend(char* mac){
   if(numFriends < 7){
     for(int i = 0; i < 12; i++)
       Friends[numFriends][i] = mac[i];
@@ -147,7 +147,7 @@ void addFriend(char* mac){
   @post command sent to bt module
   @usage sendCmd("cmd");
 */
- void sendBtCmd(char* BtCmd, bool need_ln = true){
+ void rn41::sendBtCmd(char* BtCmd, bool need_ln = true){
 
   if(i_ln){
     Serial.println(BtCmd);
@@ -165,7 +165,7 @@ void addFriend(char* mac){
   @post BtMsg has message from bt module in it terminated ny '\0'
   @usage setAsMaster();
 */
-void receiveBTResponse(char* BtMsg){
+void rn41::receiveBTResponse(char* BtMsg){
   bool keepReading = true;
   int index = 0;
   char byteIn = '\0';
@@ -190,7 +190,7 @@ void receiveBTResponse(char* BtMsg){
  @post message sent
  @usage sendMsg("Hello World");
 */
-void sendMsg(char* msg){
+void rn41::sendMsg(char* msg){
   int i = 0;
   while(msg[i] != '\0'){
     digitalWrite(lightG,LOW);
@@ -206,7 +206,7 @@ void sendMsg(char* msg){
   @post message in msg with '\0' at end
   @usage recieveMsg(msg);
 */
-void recieveMsg(char* msg){
+void rn41::recieveMsg(char* msg){
   int i = 0;
   while(Serial.available() > 0) {
       msg[i] = Serial.read();
@@ -221,7 +221,7 @@ void recieveMsg(char* msg){
   @returns true if mac is in Friends array
   @usage if(isFriend(mac)) {do stuff}
 */
-bool isFriend(char* mac){
+bool rn41::isFriend(char* mac){
   for(int i = 0; i < numFriends; i++){
     if(!strcmp(mac, Friends[i]))
       return true;
@@ -236,7 +236,7 @@ bool isFriend(char* mac){
   @returns true if inquiry has finished
   @usage if(doneLooking()) {do stuff}
 */
-bool doneLooking(){
+bool rn41::doneLooking(){
   receiveBTResponse(BTMsg);
   int msgLen = strlen(BTMsg);
   if(msgLen >= 12){
@@ -254,7 +254,7 @@ bool doneLooking(){
   @returns true if connected otherwise false
   @usage if(checkConnection()) {do things}
 */
-bool checkConnection(){
+bool rn41::checkConnection(){
   int numVal = 0;
   BTMsg = '\0'
   connected = false;
@@ -278,13 +278,13 @@ bool checkConnection(){
 
 
 /*
-  @find and connect to given bt MAC
+  @find devices and offer connection if friends
   @pre module is set to be master; must find friend mac
   @post
   @returns true if successful connection else false
   @usage makeMasterConnection();
 */
-bool makeMasterConnection(){
+bool rn41::makeMasterConnection(){
 
   lookForDevices();
   BTMsg = '\0';

@@ -7,20 +7,22 @@
 #include <Arduino.h>
 #include <rn41_lib_sand.h> //this needs to be put in the ardunio library directory
 
-#define masterMAC 123443211234
-#define slaveMAC 123443211234
+#define masterMAC "123443211234"
+#define slaveMAC "123443211234"
+
+rn41 bt;
 
 void masterTest(){
   Serial.println("--- Start Master Test ---");
   
-  char friendMac = slaveMAC;
+  char* friendMac = slaveMAC;
   char msg[256];
   
   bt.setAsMaster();
-  addFriend(friendMac);
+  bt.addFriend(friendMac);
   delay(100);
   
-  makeMasterConnection();
+  bt.makeMasterConnection();
   delay(100);
   
   Serial.println("--- Connection Section Complete ---");
@@ -39,11 +41,11 @@ void masterTest(){
 void slaveTest(){
   Serial.println("--- Start Slave Test ---");
   
-  char friendMac = masterMAC;
+  char* friendMac = masterMAC;
   char msg[256];
     
   bt.setAsSlave();
-  addFriend(friendMac);
+  bt.addFriend(friendMac);
   delay(100);
   
   while(!bt.checkConnection()){}
@@ -68,8 +70,8 @@ void setup() {
 
 void loop() 
 {  
+  //make two files when you're ready and then comment one out in each
   masterTest();
-  delay(10000);
   slaveTest();
   delay(10000);
 }
