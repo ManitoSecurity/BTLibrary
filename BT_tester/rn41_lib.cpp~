@@ -235,12 +235,11 @@ bool rn41::doneLooking(){
   @returns true if connected otherwise false
   @usage if(checkConnection()) {do things}
 */
-bool rn41::checkConnection(){
+void rn41::checkConnection(){
   delay(100);
   sendCmd("GK");  
-  if(btReply[0] == '1') connected = true;
-  else connected = false;
-  return connected;
+  if(btReply[0] == '1') connection = true;
+  else connection = false;
 }
 
 

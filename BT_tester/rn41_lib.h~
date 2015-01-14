@@ -168,7 +168,7 @@ class rn41
     static const int rxPin = RXPIN;
     static const int txPin = TXPIN;
 
-    SoftwareSerial bluetooth(rxPin, txPin);
+    SoftwareSerial bluetooth = SoftwareSerial(rxPin, txPin);
 
     char BTMsg[256];
     char BTCmd[256];
