@@ -1,16 +1,38 @@
-/* File BT_tester
- * Designed to try out the bluetooth library
- * 17 Nov 2014
- * Brian Gravelle
+/*
+ *Bluetooth test
+ *Brian Gravelle
 */
 
 #include <Arduino.h>
-#include <rn41_lib_sand.h> //this needs to be put in the ardunio library directory
+#include "rn41_lib_sand.h"
 
-#define masterMAC "123443211234"
-#define slaveMAC "123443211234"
+
+#define masterMAC "000666682E57"
+#define slaveMAC "000666682E68"
+
 
 rn41 bt;
+
+
+void setup() {
+  pinMode(RXPIN, INPUT);
+  pinMode(TXPIN, OUTPUT);      
+  delay(3500); //delay for 3.5s to let IR sensor get its ish together
+  Serial.begin(115200);
+  Serial.println("lets start this party \n");
+  bt = rn41();
+  bt.btInit(); 
+}
+
+void loop()
+{ 
+
+  delay(1000);
+
+  masterTest();
+  
+  Serial.println("print this you turd!");
+}
 
 void masterTest(){
   Serial.println("--- Start Master Test ---");
@@ -22,7 +44,10 @@ void masterTest(){
   bt.addFriend(friendMac);
   delay(100);
   
-  bt.makeMasterConnection();
+  while(!bt.makeMasterConnection()){
+    Serial.println("...");
+    delay(10);
+  }
   delay(100);
   
   Serial.println("--- Connection Section Complete ---");
@@ -35,7 +60,7 @@ void masterTest(){
   bt.recieveMsg(msg);
   Serial.print("message recieved: ");
   Serial.println(msg);
-  
+    
 }
 
 void slaveTest(){
@@ -45,12 +70,22 @@ void slaveTest(){
   char msg[256];
     
   bt.setAsSlave();
-  bt.addFriend(friendMac);
   delay(100);
+  bt.sendBtCmd("$$$", false);
+  bt.sendBtCmd("W");
+  bt.sendBtCmd("---");
+  Serial.println("--- set to slave? ---");
   
-  while(!bt.checkConnection()){}
+  bt.addFriend(friendMac);
+  delay(1000);
+  
+  while(!bt.checkConnection()){
+    delay(500);
+  }
   
   Serial.println("--- Connection Section Complete ---");
+  
+  bt.sendMsg("what's up dog?");
   
   bt.recieveMsg(msg);
   Serial.print("message recieved: ");
@@ -60,19 +95,7 @@ void slaveTest(){
   delay(100);
   
   Serial.println("--- message sent ---");
+  
 }
 
-void setup() {
-  bt = rn41();
-  bt.btInit(); 
-  Serial.begin(9600); 
-}
-
-void loop() 
-{  
-  //make two files when you're ready and then comment one out in each
-  masterTest();
-  slaveTest();
-  delay(10000);
-}
 

@@ -15,12 +15,10 @@
   @usage
 */
 rn41::rn41(){
-  masterPin  = 4;
-  isMaster   = 0;
+  isMaster   = false;
   msgToken   = 0;
-  NumFriends = 0;
+  numFriends = 0;
   connected  = false;
-  myAdr      = BTAddress;
 }
 
 /*
@@ -30,10 +28,8 @@ rn41::rn41(){
   @usage
 */
 void rn41::btInit(){
-  myAddr = MYADDRESS;
-  Serial.begin(BAUDRATE);
+  bluetooth.begin(BAUDRATE);
   checkConnection();
-  sendBtCmd("$$$", false);
   setAsSlave();
 }
 
@@ -45,7 +41,6 @@ void rn41::btInit(){
 */
 void rn41::setAsMaster(){
   sendBtCmd("SM,1");
-  sendBtCmd("---");
   reboot();
   isMaster = true;
   delay(100);
@@ -59,7 +54,6 @@ void rn41::setAsMaster(){
 */
 void rn41::setAsSlave(){
   sendBtCmd("SM,0");
-  sendBtCmd("---");
   reboot();
   isMaster = false;
   delay(100);
@@ -73,7 +67,6 @@ void rn41::setAsSlave(){
 */
 void rn41::reboot(){
   sendBtCmd("R,1");
-  sendBtCmd("---");
 }
 
 /*
@@ -83,9 +76,8 @@ void rn41::reboot(){
     <BT address>,<BT name>,<COD> CR <BT address>,<BT name>,<COD> CR "Inquiry Done" CR
   @usage
 */
-void rn41::lookForDevices(){
+void rn41::lookForDevices(){\
   sendBtCmd("I,5");
-  sendBtCmd("---");
 }
 
 /*
@@ -94,12 +86,11 @@ void rn41::lookForDevices(){
   @pre inquiry complete; module is master; BTMsg holds inquiry response
   @post
   @returns first device found
-  @usage connectionAdr = getMacFromInquiry();
+  @usage getMacFromInquiry(address);
 */
-char* rn41::getMacFromInquiry(){
-  char[12] mac;
+char* rn41::getMacFromInquiry(char* mac){
   int i;
-  for(i =0; i<12; i++){
+  for(i =0; i<13; i++){
     mac[i] = BTMsg[i];
   }
   return mac;
@@ -121,9 +112,7 @@ bool rn41::offerConnection(char* mac){
   }
   BTCmd[15] = '\0';
 
-  sendBtCmd("$$$", false);
   sendBtCmd(BTCmd);
-  sendBtCmd("---");
 }
 
 /*
@@ -134,7 +123,7 @@ bool rn41::offerConnection(char* mac){
 */
 void rn41::addFriend(char* mac){
   if(numFriends < 7){
-    for(int i = 0; i < 12; i++)
+    for(int i = 0; i < 13; i++)
       Friends[numFriends][i] = mac[i];
     numFriends++;
   }
@@ -147,41 +136,53 @@ void rn41::addFriend(char* mac){
   @post command sent to bt module
   @usage sendCmd("cmd");
 */
- void rn41::sendBtCmd(char* BtCmd, bool need_ln = true){
-
-  if(i_ln){
-    Serial.println(BtCmd);
+ void rn41::sendBtCmd(char* BtCmd, bool need_ln){
+  delay(1000);
+  bluetooth.print('$');
+  bluetooth.print('$');
+  bluetooth.print('$');
+  delay(1000);
+  if(need_ln){
+    bluetooth.println(BtCmd);
   } else{
-    Serial.print(i_pBtCmd);
+    bluetooth.print(BtCmd);
   }
 
   delay(100);
-  ReceiveBtResponse();
+  btSerial.println("---");
+  delay(100);
 }
 
 /*
-  @sets gets response from BT command
-  @pre BtMsg is char string with some space
-  @post BtMsg has message from bt module in it terminated ny '\0'
-  @usage setAsMaster();
+  @gets response from rn-41
+  @pre command sent to local bt module; expecting response
+  @post response in BTMsg
+  @usage getReply(BTMsg);
 */
-void rn41::receiveBTResponse(char* BtMsg){
-  bool keepReading = true;
-  int index = 0;
-  char byteIn = '\0';
-  BtMsg[0] = '\0';
-
-  while(keepReading){
-    keepReading = false;
-    if (Serial.available() > 0) {
-      byteIn = Serial.read();
-      if(byteIn != '\0'){
-        BtMsg[index++] = byteIn;
-        keepReading = true;
-      }
-    }
+void rn41::getReply(char* BTMsg){
+  int i = 0;
+  delay(100);
+  while(bluetooth.available()>0) 
+  {
+    btReply[i] = (char)bluetooth.read();  
+    i++;
   }
-  BtMsg[index] = '\0';
+  btReply[i] = '\0';
+  Serial.println(btReply);
+  delay(100);
+}
+
+/*
+  @cleans serial buffer from rn-41
+  @usage purgeReply();
+*/
+void purgeReply(){
+  int i = 0;
+  delay(100);
+  while(bluetooth.available() > 0)
+  {
+    bluetooth.read();  
+  }
 }
 
 /*
@@ -191,28 +192,9 @@ void rn41::receiveBTResponse(char* BtMsg){
  @usage sendMsg("Hello World");
 */
 void rn41::sendMsg(char* msg){
-  int i = 0;
-  while(msg[i] != '\0'){
-    digitalWrite(lightG,LOW);
-    delay(50);
-    Serial.print(msg[i]);
-    i++;
-  }
-}
-
-/*
-  @recieve message from BT connection via rn41 object
-  @pre msg is some arrayish thing of char with room for several bytes
-  @post message in msg with '\0' at end
-  @usage recieveMsg(msg);
-*/
-void rn41::recieveMsg(char* msg){
-  int i = 0;
-  while(Serial.available() > 0) {
-      msg[i] = Serial.read();
-      i++;
-  }
-  msg[i] = '\0';
+  delay(50);
+  bluetooth.println(msg);
+  delay(50);
 }
 
 /*
@@ -237,10 +219,10 @@ bool rn41::isFriend(char* mac){
   @usage if(doneLooking()) {do stuff}
 */
 bool rn41::doneLooking(){
-  receiveBTResponse(BTMsg);
-  int msgLen = strlen(BTMsg);
+  getReply(BTResponse);
+  int msgLen = strlen(BTResponse);
   if(msgLen >= 12){
-    char* doneMsg = &BTMsg[msgLen - 12];
+    char* doneMsg = &BTResponse[msgLen - 12];
     if(!strcmp(doneMsg, "Inquiry Done"))
       return true;
   }
@@ -248,7 +230,7 @@ bool rn41::doneLooking(){
 }
 
 /*
-  @fcheck if the module is connected
+  @check if the module is connected
   @pre BTMsg is not in use
   @post updates connected variable
   @returns true if connected otherwise false
@@ -256,18 +238,19 @@ bool rn41::doneLooking(){
 */
 bool rn41::checkConnection(){
   int numVal = 0;
-  BTMsg = '\0'
+  BTResponse[0] = '\0';
   connected = false;
   do{
     delay(1000);
     sendBtCmd("$$$", false);
+    delay(1000)
     sendBtCmd("GK"); //GK is get conncetion status
 
-    receiveBTResponse(BTMsg);
+    getReply(BTResponse);
 
-  }while(strlen(BTMsg) > 0)
+  }while(strlen(BTResponse) > 0);
 
-  numVal= atoi(BTMsg);
+  numVal= atoi(BTResponse);
 
   if(numVal == 1){
     connected = true;
@@ -287,16 +270,16 @@ bool rn41::checkConnection(){
 bool rn41::makeMasterConnection(){
 
   lookForDevices();
-  BTMsg = '\0';
+  BTResponse[0] = '\0';
   int i = 0;
   int maxTries = 10;
   while(!connected){
       delay(100);
-      receiveBTResponse(BTMsg);
-      int msgLen = strlen(BTMsg);
+      receiveBTResponse(BTResponse);
+      int msgLen = strlen(BTResponse);
       if(doneLooking()){
 
-        connectionAdr = getMacFromInquiry();
+        getMacFromInquiry(connectionAdr);
         if(isFriend(connectionAdr)){
           offerConnection(connectionAdr);
           delay(2000);

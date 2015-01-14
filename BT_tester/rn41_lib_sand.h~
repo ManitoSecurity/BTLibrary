@@ -12,14 +12,13 @@
 #define N41_h
 
 #include <Arduino.h>
-#include <../SoftwareSerial/SoftwareSerial.h>
+#include "SoftwareSerial.h"
 //this might be different depending on where you have things and what os
 
 
 //adjust to your hardware design
 #define RXPIN 3
-#define TXPIN 4
-#define BTADDRESS 123443211234
+#define TXPIN 5
 #define BAUDRATE 9600
 
 class rn41
@@ -77,9 +76,9 @@ class rn41
       @pre inquiry complete; module is master; BTMsg holds inquiry response
       @post
       @returns
-      @usage connectionAdr = getMacFromInquiry();
+      @usage connectionAdr = getMacFromInquiry(char* mac);
     */
-    char* getMacFromInquiry();
+    char* getMacFromInquiry(char* mac);
 
     /*
       @tries to enslave some bt device
@@ -110,10 +109,16 @@ class rn41
     /*
     @gets response from rn-41
     @pre command sent to local bt module; expecting response
-    @post response in msg
-    @usage receiveBTResponse(BTMsg);
+    @post response in BTMsg
+    @usage getReply(BTMsg);
     */
-    void receiveBTResponse(char* BTMsg);
+    void getReply(char* BTMsg);
+
+    /*
+    @cleans serial buffer from rn-41
+    @usage purgeReply();
+    */
+    void purgeReply();
 
     /*
     @sends message over BT connection via rn41 object
@@ -122,14 +127,6 @@ class rn41
     @usage sendMsg("Hello World");
     */
     void sendMsg(char* msg);
-
-    /*
-    @recieve message from BT connection via rn41 object
-    @pre
-    @post message in msg
-    @usage sendMsg(msg);
-    */
-    void recieveMsg(char* msg);
 
     /*
       @check if mac is friendly
@@ -168,20 +165,23 @@ class rn41
   private:
     int msgToken;
 
+    SoftwareSerial btSerial = SoftwareSerial(RXPIN, TXPIN);
+
     static const int rxPin = RXPIN;
     static const int txPin = TXPIN;
 
     char BTMsg[256];
     char BTCmd[256];
+    char BTResponse[256];
 
     static const int MaxNumFriends = 7;
-    int NumFriends;
+    int numFriends;
     char* Friends[MaxNumFriends];
 
-    char myAddr[12];
+    char* myAddr ="000666682E57";  //fix this
     bool isMaster;
     bool connected;
-    char connectionAdr[12];
+    char connectionAdr[13]; //bt address is 12 then \0
 };
 
 
