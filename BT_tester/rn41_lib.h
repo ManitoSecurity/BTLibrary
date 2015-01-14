@@ -1,6 +1,5 @@
 /**
   * @file rn41_lib_sand.h
-  * @version developmental (sandbox)
   * @date 14 November 2014
   * @author Brian Gravelle (bgravelle@zagmail.gonzaga.edu)
   * header file for communication to rn-41 bluetooth module from arduino
@@ -17,8 +16,8 @@
 
 
 //adjust to your hardware design
-#define RXPIN 3
-#define TXPIN 5
+#define TXPIN 4
+#define RXPIN 5
 #define BAUDRATE 9600
 
 class rn41

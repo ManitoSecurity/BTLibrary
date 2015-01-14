@@ -1,6 +1,5 @@
 /**
   * @file rn41_lib_sand.cpp
-  * @version developmental (sandbox)
   * @date 15 November 2014
   * @author Brian Gravelle (bgravelle@zagmail.gonzaga.edu)
   * implemetation file for communication to rn-41 bluetooth module from arduino
@@ -133,18 +132,18 @@ void rn41::addFriend(char* mac){
   @commands https://www.sparkfun.com/datasheets/Wireless/Bluetooth/rn-bluetooth-um.pdf
   @pre BtCmd holds ASCII command, if true or empty add newline after command
   @post command sent to bt module
-  @usage sendCmd("cmd");
+  @usage sendCmd(BTCmd);
 */
- void rn41::sendBtCmd(char* BtCmd, bool need_ln){
+ void rn41::sendBtCmd(char* cmd, bool need_ln){
   delay(1000);
   bluetooth.print('$');
   bluetooth.print('$');
   bluetooth.print('$');
   delay(1000);
   if(need_ln){
-    bluetooth.println(BtCmd);
+    bluetooth.println(cmd);
   } else{
-    bluetooth.print(BtCmd);
+    bluetooth.print(cmd);
   }
 
   delay(100);
@@ -155,10 +154,10 @@ void rn41::addFriend(char* mac){
 /*
   @gets response from rn-41
   @pre command sent to local bt module; expecting response
-  @post response in BTMsg
-  @usage getReply(BTMsg);
+  @post response in reply
+  @usage getReply(BTReply);
 */
-void rn41::getReply(char* BTMsg){
+void rn41::getReply(char* reply){
   int i = 0;
   delay(100);
   while(bluetooth.available()>0) 
@@ -167,7 +166,7 @@ void rn41::getReply(char* BTMsg){
     i++;
   }
   btReply[i] = '\0';
-  Serial.println(btReply);
+  Serial.println(reply);
   delay(100);
 }
 
@@ -188,7 +187,7 @@ void purgeReply(){
  @sends message over BT connection via rn41 object
  @pre
  @post message sent
- @usage sendMsg("Hello World");
+ @usage sendMsg(BTMsg);
 */
 void rn41::sendMsg(char* msg){
   delay(50);
@@ -218,10 +217,10 @@ bool rn41::isFriend(char* mac){
   @usage if(doneLooking()) {do stuff}
 */
 bool rn41::doneLooking(){
-  getReply(BTResponse);
-  int msgLen = strlen(BTResponse);
+  getReply(BTReply);
+  int msgLen = strlen(BTReply);
   if(msgLen >= 12){
-    char* doneMsg = &BTResponse[msgLen - 12];
+    char* doneMsg = &BTReply[msgLen - 12];
     if(!strcmp(doneMsg, "Inquiry Done"))
       return true;
   }
