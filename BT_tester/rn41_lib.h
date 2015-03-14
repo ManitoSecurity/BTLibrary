@@ -164,10 +164,7 @@ class rn41
   private:
     int msgToken;
 
-    static const int rxPin = RXPIN;
-    static const int txPin = TXPIN;
-
-    SoftwareSerial bluetooth(rxPin, txPin);
+    SoftwareSerial bluetooth(RXPIN, TXPIN);
 
     char BTMsg[256];
     char BTCmd[256];

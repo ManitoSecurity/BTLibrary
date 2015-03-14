@@ -1,11 +1,11 @@
 /**
-  * @file rn41_lib_sand.cpp
-  * @date 15 November 2014
+  * @file rn41_lib.cpp
+  * @date March 14 2015
   * @author Brian Gravelle (bgravelle@zagmail.gonzaga.edu)
   * implemetation file for communication to rn-41 bluetooth module from arduino
 */
 
-#include "rn41_lib_sand.h"
+#include "rn41_lib.h"
 
 /*
   @construct rn41 object
