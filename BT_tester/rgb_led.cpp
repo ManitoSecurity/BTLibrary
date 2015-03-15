@@ -7,11 +7,10 @@
 #include "rgb_led.h"
 
 
-void init_rgb_led() {
-	
-	pinMode(LED_R, OUTPUT);
-	pinMode(LED_G, OUTPUT);
-	pinMode(LED_B, OUTPUT);
+void init_rgb_led() {	
+   pinMode(LED_R, OUTPUT);
+   pinMode(LED_G, OUTPUT);
+   pinMode(LED_B, OUTPUT);
 }
 
 void turn_on_red() {

@@ -7,11 +7,7 @@
 #ifndef _RGB_LED_h
 #define _RGB_LED_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
+#include <Arduino.h>
 
 #define LED_R 9
 #define LED_G 6
