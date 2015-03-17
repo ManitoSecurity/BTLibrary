@@ -107,7 +107,10 @@ bool rn41::offerConnection(char* mac){
   BTCmd[15] = '\0';
 
   //sendBtCmd(BTCmd);
-  sendBtCmd("C,0006666D4320");
+  //sendBtCmd("C,0006666D4320");
+    sendBtCmd("SR,0006666D4320");
+    reboot();
+    sendBtCmd("C");
 }
 
 /*

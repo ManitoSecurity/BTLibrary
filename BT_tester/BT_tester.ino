@@ -24,8 +24,11 @@ void setup() {
 void loop()
 { 	
    turn_on_red();
-   //slaveTest();
-   masterTest();
+   delay(10);
+   turn_on_blue();
+   delay(10);
+   slaveTest();
+   //masterTest();
 }
 
 void masterTest(){
@@ -33,20 +36,21 @@ void masterTest(){
   delay(1000);
   char* friendMac = slaveMAC;
   char msg[32];
-  
+
   bt->setAsMaster();
-  bt->addFriend(friendMac);
+  turn_on_green();
+  delay(500);
+  //bt->addFriend(friendMac);
+  turn_on_red();
   delay(100);
   
   while(!bt->makeMasterConnection()){
     turn_on_blue();
     delay(100);
-    turn_on_red();
-    delay(100);
   }
-  delay(100);
   
-    
+  turn_on_green();
+  delay(500);
   bt->sendMsg("A");
   delay(100);
   turn_on_blue();
@@ -57,7 +61,9 @@ void masterTest(){
     msg[0] = 'X'; 
     msg[1] = '\0';
   }
+  turn_on_green();
   delay(1000);
+  while(true);
 }
 
 void slaveTest(){
@@ -67,9 +73,10 @@ void slaveTest(){
     
   bt->setAsSlave();
   delay(100);
-  bt->sendBtCmd("W");
+  //bt->sendBtCmd("W");
+  bt->sendBtCmd("Q,1");
   
-  bt->addFriend(friendMac);
+  //bt->addFriend(friendMac);
   delay(1000);
   
   while(!bt->checkConnection()){
