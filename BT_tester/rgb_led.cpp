@@ -14,19 +14,19 @@ void init_rgb_led() {
 }
 
 void turn_on_red() {
-  digitalWrite(LED_R, HIGH);
-  digitalWrite(LED_G, LOW);
-  digitalWrite(LED_B, LOW);
+  analogWrite(LED_R, ON);
+  analogWrite(LED_G, OFF);
+  analogWrite(LED_B, OFF);
 }
 
 void turn_on_green() {
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, HIGH);
-  digitalWrite(LED_B, LOW);
+  analogWrite(LED_R, OFF);
+  analogWrite(LED_G, ON);
+  analogWrite(LED_B, OFF);
 }
 
 void turn_on_blue() {
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, LOW);
-  digitalWrite(LED_B, HIGH);
+  analogWrite(LED_R, OFF);
+  analogWrite(LED_G, OFF);
+  analogWrite(LED_B, ON);
 }

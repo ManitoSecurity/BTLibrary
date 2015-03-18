@@ -38,15 +38,15 @@ void masterTest(){
   char msg[32];
 
   bt->setAsMaster();
-  turn_on_green();
-  delay(500);
-  //bt->addFriend(friendMac);
-  turn_on_red();
   delay(100);
+  bt->sendBtCmd("Q,0");
   
+  turn_on_blue();
   while(!bt->makeMasterConnection()){
-    turn_on_blue();
+    turn_on_red();
     delay(100);
+    turn_on_blue();
+    delay(500);
   }
   
   turn_on_green();
@@ -73,17 +73,16 @@ void slaveTest(){
     
   bt->setAsSlave();
   delay(100);
-  //bt->sendBtCmd("W");
-  bt->sendBtCmd("Q,1");
+  bt->sendBtCmd("Q,0");
   
   //bt->addFriend(friendMac);
   delay(1000);
   
   while(!bt->checkConnection()){
     turn_on_blue();
-    delay(100);
+    delay(500);
     turn_on_red();
-    delay(100);
+    delay(1500);
   }
       
   bt->getReply(msg, true);

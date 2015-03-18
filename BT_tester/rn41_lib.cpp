@@ -135,11 +135,12 @@ void rn41::addFriend(char* mac){
   @usage sendCmd(BTCmd);
 */
  void rn41::sendBtCmd(char* cmd, bool need_ln){
-  delay(1000);
+  delay(1100);
   bluetooth->print('$');
   bluetooth->print('$');
   bluetooth->print('$');
-  delay(1000);
+  delay(1100);
+  purgeReply();
   if(need_ln){
     bluetooth->println(cmd);
   } else{
@@ -161,7 +162,7 @@ void rn41::addFriend(char* mac){
 void rn41::getReply(char* reply, bool block){
   int i = 0;
   delay(100);
-  while( (bluetooth->available() == 0) && block );
+  //while( (bluetooth->available() == 0) && block );
   while(bluetooth->available() > 0) 
   {
     reply[i] = (char)bluetooth->read();  
@@ -277,7 +278,20 @@ bool rn41::makeMasterConnection(){
   }
   */
   
-  offerConnection("0006666D4320");
+  delay(1000);
+  bluetooth->print('$');
+  bluetooth->print('$');
+  bluetooth->print('$');
+  delay(1000);
+  bluetooth->println("SR,0006666D4320");
+  bluetooth->println("C,0006666D4320");
+  
+  delay(100);
+  bluetooth->println("---");
+  delay(100);
+  
+  //use offerConnection()
+  
   return checkConnection();
 }
 
