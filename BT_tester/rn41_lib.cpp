@@ -131,7 +131,7 @@ void rn41::addFriend(char* mac){
   @sends command to rn41 object
   @commands https://www.sparkfun.com/datasheets/Wireless/Bluetooth/rn-bluetooth-um.pdf
   @pre BtCmd holds ASCII command, if true or empty add newline after command
-  @post command sent to bt module
+  @post command sent to bt module response contained in oject variable BTReply
   @usage sendCmd(BTCmd);
 */
  void rn41::sendBtCmd(char* cmd, bool need_ln){
@@ -142,13 +142,16 @@ void rn41::addFriend(char* mac){
   delay(1100);
   purgeReply();
   if(need_ln){
-    bluetooth->println(cmd);
+    bluetooth->print(cmd);
+    bluetooth->print(0x0D);
   } else{
     bluetooth->print(cmd);
   }
-
   delay(100);
-  bluetooth->println("---");
+  getReply(BTReply);
+  delay(100);
+  bluetooth->print("---");
+  bluetooth->print(0x0D);
   delay(100);
 }
 
@@ -193,7 +196,8 @@ void rn41::purgeReply(){
 */
 void rn41::sendMsg(char* msg){
   delay(50);
-  bluetooth->println(msg);
+  bluetooth->print(msg);
+  bluetooth->print(0x0D);
   delay(50);
 }
 
@@ -239,10 +243,10 @@ bool rn41::doneLooking(){
 bool rn41::checkConnection(){
   delay(100);
   sendBtCmd("GK");  
-  getReply(BTReply);
+  //getReply(BTReply);
   if(BTReply[0] == '1') connected = true;
   else connected = false;
-  return connected;
+  return true;
 }
 
 
@@ -277,17 +281,26 @@ bool rn41::makeMasterConnection(){
      if(i > maxTries) break;
   }
   */
-  
+  char command1[] = "SR,0006666D4320";
+  char command2[] = "C,0006666D4320";
+  //char command2[] = {'C', ',', '0', '0', '0', '6', '6', '6', '6', 'D', '4', '3', '2', '0', 0x0D};
   delay(1000);
   bluetooth->print('$');
   bluetooth->print('$');
   bluetooth->print('$');
   delay(1000);
-  bluetooth->println("SR,0006666D4320");
-  bluetooth->println("C,0006666D4320");
+  //bluetooth->write("SR,0006666D4320");
+  //bluetooth->write(0x0D);
+  int i = 0;
+  while(command2[i] != '\0'){
+     bluetooth->write(command2[i]);
+     i++;
+  }
+  bluetooth->write(0x0D);
   
   delay(100);
-  bluetooth->println("---");
+  bluetooth->print("---");
+  bluetooth->print(0x0D);
   delay(100);
   
   //use offerConnection()

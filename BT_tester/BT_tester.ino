@@ -32,11 +32,11 @@ void loop()
 }
 
 void masterTest(){
-  turn_on_red();
-  delay(1000);
   char* friendMac = slaveMAC;
   char msg[32];
 
+  turn_on_red();
+  delay(1000);
   bt->setAsMaster();
   delay(100);
   bt->sendBtCmd("Q,0");
@@ -50,6 +50,7 @@ void masterTest(){
   }
   
   turn_on_green();
+  while(1);
   delay(500);
   bt->sendMsg("A");
   delay(100);
@@ -71,7 +72,7 @@ void slaveTest(){
   char* friendMac = masterMAC;
   char msg[32];
     
-  bt->setAsSlave();
+  //bt->setAsSlave();
   delay(100);
   bt->sendBtCmd("Q,0");
   
@@ -84,7 +85,8 @@ void slaveTest(){
     turn_on_red();
     delay(1500);
   }
-      
+  turn_on_green();
+  while(1);  
   bt->getReply(msg, true);
 
   if(msg[0] == 'A') turn_on_green();
